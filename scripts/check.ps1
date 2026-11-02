@@ -35,8 +35,8 @@ try {
     Invoke-Step 'uv sync --locked (fails if uv.lock is out of date)' { uv sync --locked }
     Invoke-Step 'ruff check' { uv run ruff check . }
     Invoke-Step 'ruff format --check' { uv run ruff format --check . }
-    Invoke-Step 'mypy (strict)' { uv run mypy }
-    Invoke-Step 'pytest (entire suite)' { uv run pytest }
+    Invoke-Step 'mypy (strict)' { uv run python -m mypy }
+    Invoke-Step 'pytest (entire suite)' { uv run python -m pytest }
 
     Write-Host ''
     Write-Host 'All gates passed.' -ForegroundColor Green
