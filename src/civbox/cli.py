@@ -36,6 +36,9 @@ def build_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True, metavar="COMMAND")
 
     commands.add_parser("version", help="print the installed version")
+    commands.add_parser(
+        "runtime", help="print the numerical runtime fingerprint and CPU dispatch state"
+    )
 
     config = commands.add_parser("config", help="inspect process configuration")
     config_commands = config.add_subparsers(dest="config_command", required=True, metavar="ACTION")
@@ -64,6 +67,20 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.command == "version":
         print(__version__)
+        return EXIT_OK
+
+    if args.command == "runtime":
+        from civbox.sim.runtime import DISPATCH_ENVIRONMENT_VARIABLE, RuntimeFingerprint
+
+        fingerprint = RuntimeFingerprint.collect()
+        report = {
+            "fingerprint": fingerprint.to_dict(),
+            "restricted_to_baseline": fingerprint.restricted_to_baseline,
+            "baseline_only_setting": {
+                DISPATCH_ENVIRONMENT_VARIABLE: fingerprint.baseline_only_setting
+            },
+        }
+        print(json.dumps(report, indent=2, sort_keys=True))
         return EXIT_OK
 
     try:

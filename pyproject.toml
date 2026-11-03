@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 classifiers = ["Private :: Do Not Upload"]
 dependencies = [
     "fastapi>=0.162,<1",
+    "numpy>=2.5.4,<3",
     "pydantic>=2.14,<3",
     "pydantic-settings>=2.16,<3",
     "uvicorn>=0.54,<1",
@@ -17,6 +18,7 @@ civbox = "civbox.cli:main"
 [dependency-groups]
 dev = [
     "httpx>=0.28",
+    "import-linter>=2.15",
     "mypy>=2.4",
     "pytest>=9.2",
     "ruff>=0.17",
@@ -66,3 +68,26 @@ warn_required_dynamic_aliases = true
 testpaths = ["tests"]
 addopts = ["-ra", "--strict-markers", "--strict-config"]
 filterwarnings = ["error"]
+
+[tool.importlinter]
+root_package = "civbox"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "core is the foundation and imports no other civbox package"
+type = "forbidden"
+source_modules = ["civbox.core"]
+forbidden_modules = ["civbox.api", "civbox.sim", "civbox.cli"]
+
+[[tool.importlinter.contracts]]
+name = "the simulation core is independent of web, network and application layers"
+type = "forbidden"
+source_modules = ["civbox.sim"]
+forbidden_modules = [
+    "civbox.api",
+    "civbox.cli",
+    "fastapi",
+    "starlette",
+    "uvicorn",
+    "httpx",
+]
